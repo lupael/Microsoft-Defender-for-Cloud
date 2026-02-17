@@ -8,17 +8,16 @@
 
 ## Objectives
 
-This exercise guides you MDC's database protection plans. Database protection in Defender for Cloud contains four flavors, depending on which database type you are looking to protect.
+This exercise guides you through Defender for Cloud's database protection plans. Database protection in Defender for Cloud contains four flavors:
 
-1. Defender for SQL PaaS (SQL on Azure VM):Vulnerability assessment and threat protection is available for this plan. Read more about it [here](https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-sql-introduction).
-2. Defender for SQL on machines (SQL servers on machines hosted on premise, in Azure, AWS or GCP):
-For this plan, vulnerability assessment and detecting anomalous activities are available to protect your Iaas SQL Servers. Read more about it [here](https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-sql-servers-introduction).
+1. Defender for SQL IaaS (SQL on Azure VM or outside of Azure): For this plan, agent-based [vulnerability assessment](https://learn.microsoft.com/en-us/azure/defender-for-cloud/sql-azure-vulnerability-assessment-overview) and [advanced threat protection](https://learn.microsoft.com/en-us/azure/azure-sql/database/threat-detection-overview?view=azuresql&toc=%2Fazure%2Fdefender-for-cloud%2Ftoc.json) are available to protect your Iaas SQL Servers.
+2. Defender for SQL Paas (Azure SQL): For this plan, agentless vulnerability assessment and advanced threat protection are available to protect your SQL Servers as well as [data security posture management](https://learn.microsoft.com/en-us/azure/defender-for-cloud/concept-data-security-posture?view=azuresql). 
 3. Defender for Open-source relational database:
-Protect your PostgreSQL and MySQL resources by detecting anomalous activities. Read more about these security alerts [here](https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-databases-introduction).
+Agentless advanced threat protection is available to protect your OSS databases. Read more about these security alerts [here](https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-databases-introduction). Data Security Posture Management and Advanced Threat Protection for AWS RDS resources are supported with this plan as well. 
 4. Defender for Cosmos DB (NoSQL):
-Detect potential threats against Cosmos DB accounts like SQL injection, compromised identities or potential exploitation. Read more about CosmosDB protection [here](https://learn.microsoft.com/en-us/azure/defender-for-cloud/concept-defender-for-cosmos).
+Agentless advanced threat protection is available to protect against Cosmos DB accounts. Read more about CosmosDB protection [here](https://learn.microsoft.com/en-us/azure/defender-for-cloud/concept-defender-for-cosmos).
 
-### Exercise 1: Create a SQL Server on an Azure VM, enable Defender for SQL servers on machines plan and validate alerts
+### Exercise 1: Enable Defender for SQL servers on machines plan, create a SQL Server on an Azure VM, and validate findings and alerts
 
 To enable the Defender plan on a specific subscription:
 
@@ -29,42 +28,47 @@ To enable the Defender plan on a specific subscription:
 5. Click on **Select types** and ensure **SQL servers on machines** is toggled `On`.
 6. Click **Continue** and **Save**.
 
-Now all your existing and upcoming Azure SQL servers on machines are protected.
+Now all your existing and upcoming Arc-enabled SQL servers on machines are protected.
 
 #### Create a SQL Server on a Windows Virtual Machine
 
-First use the ARM template to create a SQL server on a Windows Virtual Machine [here](https://learn.microsoft.com/en-us/azure/azure-sql/virtual-machines/windows/sql-vm-create-portal-quickstart?view=azuresql&tabs=conventional-vm).
-
-1. To deploy, click on the blue **Deploy to Azure** button below:
+1. use the ARM template to create a SQL server on a Windows Virtual Machine [here](https://learn.microsoft.com/en-us/azure/azure-sql/virtual-machines/windows/sql-vm-create-portal-quickstart?view=azuresql&tabs=conventional-vm) or, click on the blue **Deploy to Azure** button below:
 
     [![BlueAzurebutton][def]](<https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-quickstart-templates%2Fmaster%2Fquickstarts%2Fmicrosoft.sqlvirtualmachine%2Fsql-vm-new-storage%2Fazuredeploy.json>) 
 
-3. Click **Review and Create** and then when it's ready, click **Create**.
+2. Click **Review and Create** and then when it's ready, click **Create**.
 
     ![SQLVMtemplate](../Images/module12_sqlvmtemplate_yl.png)
 
-4. Once created, make sure **Defender for SQL on machines** plan is enabled.
+3. Once created, make sure **Defender for SQL on machines** plan is enabled.
 
-5. Navigate to the virtual machine. Click on **Extensions + applications**. Notice three extensions: `MicrosoftDefenderforSQL` and `SqlIaasExtension`.
+4. Navigate to the virtual machine. Click on **Extensions + applications**. Notice two extensions: `MicrosoftDefenderforSQL` and `SqlIaasExtension`.
 
-#### View vulnerability assessments
+#### View and remediate vulnerability assessments
+Vulnerability assessment will scan your SQL database and surface any deviations, misconfigurations and vulnerabilities. Read more about this [here](https://learn.microsoft.com/en-us/azure/defender-for-cloud/sql-azure-vulnerability-assessment-overview). 
 
-1. Navigate to the SQL virtual machine resource in the Azure portal.
-2. Under Security, click on **Microsoft Defender for Cloud**.
-3. There are **Recommendations**, **Security incidents and alerts** and **Vulnerability assessment findings** on this page.
-4. Under **Vulnerability assessment findings**, choose a finding.  
-5. Take note of vulnerability assessment details.
-6. Under **Affected resources**, click on **resource**.
-7. Locate and click on **Vulnerability assessment** under **Findings**.
-8. See option to **Add all results as baseline** or **Remove all from baseline**.
-![SQL VA Baseline](../Images/12sqlbaseline_yl.png)
-Vulernerability assessment findings come from a knowledge base of best practices built-in scanning service in Azure SQL database. It will flag any deviations from best practices like misconfigurations. Read more about this [here](https://learn.microsoft.com/en-us/azure/defender-for-cloud/sql-azure-vulnerability-assessment-overview). Remediate any findings or accept as is.
+There are two ways to view vulnerability assessment findings.
+Through the individual server for a per-server aggregated view.  
+1. Navigate to the SQL virtual machine resource in the Azure portal for the server-level view.
+2. Follow the steps listed here: https://learn.microsoft.com/en-us/azure/defender-for-cloud/sql-azure-vulnerability-assessment-find?tabs=server-level#review-and-remediate-vulnerabilities-azure-portal
+   
+Through Defender for Cloud's recommendations for a per-database view.
+1. Navigate to **Recommendations** in Defender for Cloud for database-level view.
+2. Follow the steps listed here: https://learn.microsoft.com/en-us/azure/defender-for-cloud/sql-azure-vulnerability-assessment-find?tabs=database-level#review-and-remediate-vulnerabilities-azure-portal
+
+#### Simulate alerts in Defender for SQL on machines
+1. Validate the protection status on your machine by following instructions [here](https://learn.microsoft.com/en-us/azure/defender-for-cloud/verify-machine-protection#verify-protection-on-a-single-sql-server-vm).
+2. Follow instructions [here](https://learn.microsoft.com/en-us/azure/defender-for-cloud/simulate-alerts-sql-machines#simulate-alerts) to run simulation.
+>Note: Make sure to meet the pre-requisites, like the permissions required to deploy a custom extension and SQL authentication mode to the SQL server
+
 
 ### Exercise 2: Enable and protect your Azure SQL Databases using Microsoft Defender for Azure SQL Databases
 
+Defender for Cloud protects your Azure SQL databases. 
+
 #### Enable database protection on your Azure SQL Database
 
-A SQL server should also have been created, earlier in module 1, and it should be labeled as “asclab-sql-[string]”. If so, you should also be able to locate your SQL databased, labeled as “asclab-db”.
+A SQL server should also have been created, earlier in module 1, and it should be labeled as “asclab-sql-[string]”. If so, you should also be able to locate your SQL database, labeled as “asclab-db”.
 
 1. Sign into the **Azure portal**.
 2. Navigate to **Microsoft Defender for Cloud**, then **Environment settings**.
@@ -78,18 +82,27 @@ Now all your existing (asclab-db from Module 1) and upcoming Azure SQL Databases
 
 #### Understand vulnerability assessment on your Azure SQL Database
 
-This part of the exercise will leverage "asclab-db".
+This part of the exercise will leverage "asclab-db". VA experience is the same as exercise 1.
 
-1. Sign into the **Azure portal**.
-2. Navigate to the SQL server or to database directly by searching **“asclab-db”**.
-3. Click on **Microsoft Defender for Cloud** under **Security**.
-4. **Recommendations** and **Vulnerability assessment findings** should be available.
-![Azure SQL Database findings](../Images/12sqldatabaseRecsVAFindings-yl.png)
-5. Vulernerability assessment findings come from a knowledge base of best practices built-in scanning service in Azure SQL database. It will flag any deviations from best practices like misconfigurations. Read more about this [here](https://learn.microsoft.com/en-us/azure/defender-for-cloud/sql-azure-vulnerability-assessment-overview). Remediate any findings or accept as is.
+#### View and remediate vulnerability assessments
+Vulnerability assessment will scan your SQL database and surface any deviations, misconfigurations and vulnurabilities. Read more about this [here](https://learn.microsoft.com/en-us/azure/defender-for-cloud/sql-azure-vulnerability-assessment-overview). 
+
+There are two ways to view vulnerability assessment findings.
+Through the individual server for a per-server aggregated view.  
+1. Navigate to the SQL virtual machine resource **“asclab-db”** in the Azure portal for the server-level view.
+2. Follow the steps listed here: https://learn.microsoft.com/en-us/azure/defender-for-cloud/sql-azure-vulnerability-assessment-find?tabs=server-level#review-and-remediate-vulnerabilities-azure-portal
+   
+Through Defender for Cloud's recommendations for a per-database view
+1. Navigate to **Recommendations** in Defender for Cloud for database-level view.
+2. Follow the steps listed here: https://learn.microsoft.com/en-us/azure/defender-for-cloud/sql-azure-vulnerability-assessment-find?tabs=database-level#review-and-remediate-vulnerabilities-azure-portal
+
+### Explore Data Security Posture Management for your Azure SQL Databases
+1. Follow the instructions in [module 23, exercise 5](https://github.com/Azure/Microsoft-Defender-for-Cloud/blob/main/Labs/Modules/Module%2023%20-%20Data%20security%20posture%20management.md#optional-upload-data-to-azure-sql-database) to upload sensitive data to your Azure SQL database. 
+2. Follow instructions in module 23, [exercise 6](https://github.com/Azure/Microsoft-Defender-for-Cloud/blob/main/Labs/Modules/Module%2023%20-%20Data%20security%20posture%20management.md#exercise-6-explore-risks-with-cloud-security-explorer) to explore risk in Cloud Security Explorer, [exercise 8](https://github.com/Azure/Microsoft-Defender-for-Cloud/blob/main/Labs/Modules/Module%2023%20-%20Data%20security%20posture%20management.md#optional-exercise-8-explore-risks-through-attack-paths) to explore risks through attack paths, [exercise 10](https://github.com/Azure/Microsoft-Defender-for-Cloud/blob/main/Labs/Modules/Module%2023%20-%20Data%20security%20posture%20management.md#optional-exercise-10-data-security-dashboard-investigation) to explore the Data Security Dashboard. 
 
 ### Exercise 3: Enable and protect your OSS RDBs using Microsoft Defender for Open-source relational databases
 
-Defender for Cloud protects PostgreSQL, MySQL flexible servers and MariaDB.
+Defender for Cloud protects PostgreSQL, MySQL flexible servers and AWS RDS databases including MariaDB.
 
 #### Enable database protection for your open source relational databases
 
@@ -112,7 +125,7 @@ Defender for Cloud protects PostgreSQL, MySQL flexible servers and MariaDB.
 
 #### Understand AWS RDS protection
 
-Defender for Cloud now extends its protection to AWS RDS. See this announcement here: [Microsoft Defender for Open-Source Relational Databases Now Supports Multicloud (AWS RDS)](https://techcommunity.microsoft.com/blog/microsoftdefendercloudblog/microsoft-defender-for-open-source-relational-databases-now-supports-multicloud-/4127655).
+Defender for Cloud extends its protection to AWS RDS. See this announcement here: [Microsoft Defender for Open-Source Relational Databases Now Supports Multicloud (AWS RDS)](https://techcommunity.microsoft.com/blog/microsoftdefendercloudblog/microsoft-defender-for-open-source-relational-databases-now-supports-multicloud-/4127655).
 In addition to the advance threat protection capabilities for AWS RDS, Defender for open-source relational databases also bundles sensitive data discovery as part of its core value. 
 Refer to Module 11 to familiarize yourself with the AWS connector in MDC. 
 
@@ -131,7 +144,7 @@ Refer to Module 11 to familiarize yourself with the AWS connector in MDC.
 ##### Create an RDS instance with sensitive information
 1.	Sign into your AWS portal and create one of the supported RDS resources. 
 2.	Upload sensitive data into the just created RDS database
-    >Refer to [Module 23, exercise 5 for guidance](https://github.com/Azure/Microsoft-Defender-for-Cloud/blob/main/Labs/Modules/Module%2023%20-%20Data%20security%20posture%20management.md?plain=1) or [AWS doc](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MySQL.Procedural.Importing.AnySource.html) for assistance. 
+    >Refer to [AWS doc](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/mysql-importing-data-any-source.html) for assistance. 
 3.	Wait 24 hours
 
 ##### Look for enriched findings in Cloud Security Explorer:
@@ -150,12 +163,7 @@ Other places to look for findings:
 
 ### Exercise 4: Explore Defender for Azure Cosmos DB
 
-First use the ARM template to create an Azure Cosmos DB or follow the instructions [here](https://learn.microsoft.com/en-us/azure/cosmos-db/nosql/quickstart-portal).
-
-1. To deploy, click on the blue **Deploy to Azure** button below:
-
-    [![BlueAzurebutton][def]](<https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-quickstart-templates%2Fmaster%2Fquickstarts%2Fmicrosoft.documentdb%2Fcosmosdb-sql-autoscale%2Fazuredeploy.json" target="_blank">)
-
+1. Deploy an Azure Cosmos DB by following the instructions [here](https://learn.microsoft.com/en-us/azure/cosmos-db/nosql/quickstart-portal).
 2. Click **Deploy to Azure**.
 3. Fill in all the necessary fields.
 4. Click **Review and Create** and then when it's ready, click
@@ -182,4 +190,5 @@ Now all your existing and upcoming Azure Cosmos DB accounts are protected.
 ### Continue with the next lab [Module 13: Defender for APIs](https://github.com/Azure/Microsoft-Defender-for-Cloud/blob/main/Labs/Modules/Module-13-Defender%20for%20APIs.md)
 
 [def]: https://aka.ms/deploytoazurebutton/
+
 
